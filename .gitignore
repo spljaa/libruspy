@@ -1,5 +1,5 @@
 .venv
-testrun.*
+testrun*.*
 plan.png
 _librus*
 __pycache__

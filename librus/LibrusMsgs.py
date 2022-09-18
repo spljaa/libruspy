@@ -13,6 +13,8 @@ class LibrusMsgs:
                         (id int primary key, nadawca text, temat text, wiadomosc text)''')
         self.runQuery('''CREATE TABLE IF NOT EXISTS ogloszenia
                         (id text primary key, startDate text, temat text, ogloszenie text)''')
+        self.runQuery('''CREATE TABLE IF NOT EXISTS grades
+                        (id text primary key, date text, subject text, grade text)''')
 
     def finish(self):
         self.db.close()
@@ -35,7 +37,7 @@ class LibrusMsgs:
         ids = resp.fetchall()
         return [x[0] for x in ids]
 
-    def getMsgIDs(self):
+    def getMsgIds(self):
         return self.getIds("wiadomosci")
 
     def printMsg(self, msgid):
@@ -55,3 +57,16 @@ class LibrusMsgs:
         msg = self.cur.execute("select temat, startDate, ogloszenie from ogloszenia where id = ?", (noteid,)).fetchone()
         return["""\
 {}""".format(msg[2]),"SchoolNotice"," ".join([msg[1],msg[0]])]
+    
+    def getGradeIds(self):
+        return self.getIds("grades")
+
+    def addGrade(self, grd):
+        query = "insert into grades values (?, ?, ?, ?)"
+        params = (grd["Id"], grd["Date"], grd["Subject"], grd["Grade"])
+        self.runQuery(query, params)
+    
+    def printGrade(self, grdid):
+        msg = self.cur.execute("select subject, date, grade from grades where id = ?", (grdid,)).fetchone()
+        return["""\
+{}""".format(" "),"NewGrade"," ".join([msg[2], msg[0], "({})".format(msg[1])])]

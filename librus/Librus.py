@@ -94,7 +94,7 @@ class Librus:
         lmsgs = self.web.get("https://wiadomosci.librus.pl/api/inbox/messages").json()
         self.msgs = lmsgs["data"]
         self.msgscount = lmsgs["total"]
-        indb = librusdb.getMsgIDs()
+        indb = librusdb.getMsgIds()
         inlib = [int(x["messageId"]) for x in self.msgs]
         for k in inlib:
             if k in indb:
@@ -114,3 +114,19 @@ class Librus:
                 print("{} pobierane".format(k["Id"]))
                 librusdb.addNotice(k)
                 msgCenter.sendEmail(librusdb.printNotice(k["Id"]))
+    
+    def checkNewGrades(self, librusdb, msgCenter):
+        grades = self.callAPI("Grades")["Grades"]
+        indb = librusdb.getGradeIds()
+        for g in grades:
+            if g["Id"] in indb:
+                print("{} w bazie".format(g["Id"]))
+            else:
+                print("{} pobierane".format(g["Id"]))
+                grd = {}
+                grd["Id"] = g["Id"]
+                grd["Date"] = g["Date"]
+                grd["Subject"] = self.subjects[g["Subject"]["Id"]]
+                grd["Grade"] = g["Grade"]
+                librusdb.addGrade(grd)
+                msgCenter.sendEmail(librusdb.printGrade(g["Id"]))
