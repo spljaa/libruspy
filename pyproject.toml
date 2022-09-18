@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "librus"
+version = "0.1.0"
+description = ""
+authors = ["Jan Alboszta <janek@drzemka.info>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "*"
+pandas = "*"
+matplotlib = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

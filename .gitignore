@@ -1,0 +1,6 @@
+.venv
+testrun.*
+plan.png
+_librus*
+__pycache__
+poetry.lock
