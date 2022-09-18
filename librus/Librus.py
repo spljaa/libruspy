@@ -119,7 +119,7 @@ class Librus:
         grades = self.callAPI("Grades")["Grades"]
         indb = librusdb.getGradeIds()
         for g in grades:
-            if g["Id"] in indb:
+            if str(g["Id"]) in indb:
                 print("{} w bazie".format(g["Id"]))
             else:
                 print("{} pobierane".format(g["Id"]))
