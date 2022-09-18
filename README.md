@@ -1,4 +1,4 @@
-# Simple wrapper arount Librus web page
+# Simple wrapper around Librus web page
 
 ## Goals
 My aim for this project is to create python classes to deal with notifications and informations presented in Librus system.
@@ -22,7 +22,7 @@ It is on my list of TODO to provide examples
 
 ## Current state
 As of September 2022 I see enough parts working to push it to github.
-Script can login, collect messages, school notices and trmetable events.
+Script can login, collect messages, grades, school notices and timetable events.
 There is class for storing data in sqlite3 file, and class to send an email with fresh data.
 
 I have no plans to provide write-like actions. Thus for sending a message one needs to use web browser. 
