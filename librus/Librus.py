@@ -131,9 +131,9 @@ class Librus:
         indb = librusdb.getGradeIds()
         for g in grades:
             if str(g["Id"]) in indb:
-                print(f"{} w bazie".format(g["Id"]))
+                print(f"{g['Id']} w bazie")
             else:
-                print("{} pobierane".format(g["Id"]))
+                print(f"{g['Id']} pobierane")
                 grd = {}
                 grd["Id"] = g["Id"]
                 grd["Date"] = g["Date"]
