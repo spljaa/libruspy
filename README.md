@@ -11,6 +11,12 @@ Librus page offers some API endpoints and gateway to access it for logged users.
 ## Inspirations
 Many thanks for [weekplot project](https://github.com/utkuufuk/weekplot) as source used in calendar plotting class
 
+
+## How it works
+Python class keeps a session with all cookies required to interact with Librus web page. Some of them seems to be shor-lived.
+There is more complex ulr handling for Messages. As it is on separate web page. 
+
+
 ## Usage
 It is on my list of TODO to provide examples
 
@@ -19,3 +25,5 @@ As of September 2022 I see enough parts working to push it to github.
 Script can login, collect messages, school notices and trmetable events.
 There is class for storing data in sqlite3 file, and class to send an email with fresh data.
 
+I have no plans to provide write-like actions. Thus for sending a message one needs to use web browser. 
+Simple reason for that is lack of testing environment - I do not want to spam teachers (yet...)
