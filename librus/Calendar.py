@@ -34,8 +34,9 @@ class Calendar:
         newEvent = {"Day": dayofweek, "HourFrom": start, "HourTo": end,
                     "Subject": subject, "Teacher": teacher,
                     "Classroom": classrom, "IsSubstitution": issubstitution}
-        self.events = pd.concat([self.events,
-                                 pd.DataFrame(newEvent, index=[0])]).reset_index(drop=True)
+        self.events = (pd.concat([self.events,
+                                 pd.DataFrame(newEvent, index=[0])])
+                       .reset_index(drop=True))
 
     def assignColors(self):
         i = 0

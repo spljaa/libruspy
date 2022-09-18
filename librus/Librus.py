@@ -7,10 +7,12 @@ class Librus:
     password = ""
     web = requests.session()
     __mainhost = "https://synergia.librus.pl"
-    __messagehost = "https://wiadomosci.librus.pl"
+    __msghost = "https://wiadomosci.librus.pl"
     __apihost = "https://api.librus.pl"
     __portalhost = "https://portal.librus.pl/"
     __apigateway = "https://synergia.librus.pl/gateway/api/2.0"
+    __logonhost = f"{__mainhost}/loguj/portalRodzina"
+    __msginbox = f"{__msghost}/api/inbox/messages"
     msgs = []
     msgscount = 0
     subjects = {}
@@ -25,9 +27,12 @@ class Librus:
     def login(self):
         my_headers = {"Referer": self.__portalhost}
         self.web.get("{}/rodzina".format(self.__portalhost))
-        w = self.web.get("{}/loguj/portalRodzina?v={}".format(self.__mainhost, int(datetime.timestamp(datetime.now()))), headers=my_headers)
+        w = (self.web.get("{}?v={}"
+                          .format(self.__logonhost,
+                                  int(datetime.timestamp(datetime.now()))),
+                          headers=my_headers))
         nloc = w.history[1].headers["location"]
-        self.web.get("{}{}".format(self.__apihost, nloc))
+        self.web.get(f"{self.__apihost}{nloc}")
         pdata = {"action": "login",
                  "login": self.username,
                  "pass": self.password}
@@ -41,10 +46,11 @@ class Librus:
         self.web.get("{}/wiadomosci3".format(self.__mainhost))
 
     def logout(self):
-        r = self.web.get("{}/api/auth/logout".format(self.__messagehost)).json()["data"]
+        r = (self.web.get("{}/api/auth/logout"
+             .format(self.__msghost)).json()["data"])
         print(r["status"])
         nurl = r["redirectUrl"]
-        self.web.get("{}{}".format(self.__messagehost, nurl))
+        self.web.get("{}{}".format(self.__msghost, nurl))
 
     def setSubjects(self):
         s = self.callAPI("Subjects")
@@ -54,7 +60,8 @@ class Librus:
     def getTeacher(self, tid):
         if tid not in self.teachers:
             r = self.callAPI("Users/{}".format(tid))
-            self.teachers[tid] = r["User"]["FirstName"] + " " + r["User"]["LastName"]
+            self.teachers[tid] = (r["User"]["FirstName"]
+                                  + " " + r["User"]["LastName"])
         return self.teachers[tid]
 
     def getClassroom(self, cid):
@@ -67,7 +74,8 @@ class Librus:
         return self.web.get("{}/{}".format(self.__apigateway, endpoint)).json()
 
     def addEvents(self, calendar):
-        planZajecRaw = self.callAPI("Timetables?weekStart={}".format(calendar.week))
+        planZajecRaw = (self.callAPI("Timetables?weekStart={}"
+                                     .format(calendar.week)))
         day = 0
         for k, v in planZajecRaw["Timetable"].items():
             for lekcja in v:
@@ -76,9 +84,11 @@ class Librus:
                     t = self.getTeacher(int(lekcja[0]["Teacher"]["Id"]))
                     z = lekcja[0]["IsSubstitutionClass"]
                     if not z:
-                        sala = self.getClassroom(int(lekcja[0]["Classroom"]["Id"]))
+                        sala = (self.getClassroom(int(lekcja[0]
+                                ["Classroom"]["Id"])))
                     else:
-                        sala = self.getClassroom(int(lekcja[0]["OrgClassroom"]["Id"]))
+                        sala = (self.getClassroom(int(lekcja[0]
+                                ["OrgClassroom"]["Id"])))
                     h = lekcja[0]["HourFrom"]
                     e = lekcja[0]["HourTo"]
                     calendar.addEvent(calendar.ty[day], h, e, s, t, sala, z)
@@ -88,10 +98,11 @@ class Librus:
         return calendar
 
     def getFullMsg(self, msgid):
-        return self.web.get("https://wiadomosci.librus.pl/api/inbox/messages/{}".format(msgid)).json()["data"]
+        return (self.web.get("{}/{}".format(self.__msginbox, msgid))
+                .json()["data"])
 
     def checkNewMsg(self, librusdb, msgCenter):
-        lmsgs = self.web.get("https://wiadomosci.librus.pl/api/inbox/messages").json()
+        lmsgs = self.web.get(self.__msginbox).json()
         self.msgs = lmsgs["data"]
         self.msgscount = lmsgs["total"]
         indb = librusdb.getMsgIds()
@@ -114,13 +125,13 @@ class Librus:
                 print("{} pobierane".format(k["Id"]))
                 librusdb.addNotice(k)
                 msgCenter.sendEmail(librusdb.printNotice(k["Id"]))
-    
+
     def checkNewGrades(self, librusdb, msgCenter):
         grades = self.callAPI("Grades")["Grades"]
         indb = librusdb.getGradeIds()
         for g in grades:
             if str(g["Id"]) in indb:
-                print("{} w bazie".format(g["Id"]))
+                print(f"{} w bazie".format(g["Id"]))
             else:
                 print("{} pobierane".format(g["Id"]))
                 grd = {}

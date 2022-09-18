@@ -10,11 +10,14 @@ class LibrusMsgs:
         self.db = sqlite3.connect(dbpath)
         self.cur = self.db.cursor()
         self.runQuery('''CREATE TABLE IF NOT EXISTS wiadomosci
-                        (id int primary key, nadawca text, temat text, wiadomosc text)''')
+                        (id int primary key, nadawca text,
+                         temat text, wiadomosc text)''')
         self.runQuery('''CREATE TABLE IF NOT EXISTS ogloszenia
-                        (id text primary key, startDate text, temat text, ogloszenie text)''')
+                        (id text primary key, startDate text,
+                         temat text, ogloszenie text)''')
         self.runQuery('''CREATE TABLE IF NOT EXISTS grades
-                        (id text primary key, date text, subject text, grade text)''')
+                        (id text primary key, date text,
+                         subject text, grade text)''')
 
     def finish(self):
         self.db.close()
@@ -47,17 +50,18 @@ class LibrusMsgs:
 
     def addNotice(self, note):
         query = "insert into ogloszenia values (?, ?, ?, ?)"
-        params = (note["Id"], note["StartDate"], note["Subject"], note["Content"])
+        params = (note["Id"], note["StartDate"],
+                  note["Subject"], note["Content"])
         self.runQuery(query, params)
-        
+
     def getNoteIds(self):
-        return self.getIds("ogloszenia")  
+        return self.getIds("ogloszenia")
 
     def printNotice(self, noteid):
         msg = self.cur.execute("select temat, startDate, ogloszenie from ogloszenia where id = ?", (noteid,)).fetchone()
         return["""\
-{}""".format(msg[2]),"SchoolNotice"," ".join([msg[1],msg[0]])]
-    
+{}""".format(msg[2]), "SchoolNotice", " ".join([msg[1], msg[0]])]
+
     def getGradeIds(self):
         return self.getIds("grades")
 
@@ -65,8 +69,8 @@ class LibrusMsgs:
         query = "insert into grades values (?, ?, ?, ?)"
         params = (grd["Id"], grd["Date"], grd["Subject"], grd["Grade"])
         self.runQuery(query, params)
-    
+
     def printGrade(self, grdid):
         msg = self.cur.execute("select subject, date, grade from grades where id = ?", (grdid,)).fetchone()
         return["""\
-{}""".format(" "),"NewGrade"," ".join([msg[2], msg[0], "({})".format(msg[1])])]
+{}""".format(" "), "NewGrade", " ".join([msg[2], msg[0], "({})".format(msg[1])])]
