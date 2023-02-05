@@ -153,7 +153,7 @@ class Librus:
                 if "Skill" in g:
                     print()
                     sk = self.getSkill(g["Skill"]["Id"])
-                    grd["Subject"] += f' - {self.getSkill(g["Skill"]["Id"])}'
+                    grd["Subject"] += f' - {self.getSkill(g["Skill"]["Id"])}'.replace('\n',"")
                     
                 librusdb.addGrade(grd)                
                 msgCenter.sendEmail(librusdb.printGrade(g["Id"]))
