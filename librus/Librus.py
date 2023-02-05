@@ -18,6 +18,7 @@ class Librus:
     subjects = {}
     teachers = {}
     classrooms = {}
+    skills = {}
 
     def __init__(self, user, pw):
         self.username = user
@@ -59,10 +60,16 @@ class Librus:
 
     def getTeacher(self, tid):
         if tid not in self.teachers:
-            r = self.callAPI("Users/{}".format(tid))
+            r = self.callAPI(f"Users/{tid}")
             self.teachers[tid] = (r["User"]["FirstName"]
                                   + " " + r["User"]["LastName"])
         return self.teachers[tid]
+    
+    def getSkill(self, sid):
+        if sid not in self.skills:
+            r = self.callAPI(f"DescriptiveGrades/Skills/{sid}")
+            self.skills[sid] = r["Skill"]["Name"]
+        return self.skills[sid]
 
     def getClassroom(self, cid):
         if cid not in self.classrooms:
@@ -128,8 +135,9 @@ class Librus:
 
     def checkNewGrades(self, librusdb, msgCenter):
         grades = self.callAPI("Grades")["Grades"]
+        dgrades = self.callAPI("DescriptiveGrades")["Grades"]
         indb = librusdb.getGradeIds()
-        for g in grades:
+        for g in grades + dgrades:
             if str(g["Id"]) in indb:
                 print(f"{g['Id']} w bazie")
             else:
@@ -138,6 +146,14 @@ class Librus:
                 grd["Id"] = g["Id"]
                 grd["Date"] = g["Date"]
                 grd["Subject"] = self.subjects[g["Subject"]["Id"]]
-                grd["Grade"] = g["Grade"]
-                librusdb.addGrade(grd)
+                if "RealGradeValue" in g:
+                    grd["Grade"] = g["RealGradeValue"]
+                else:
+                    grd["Grade"] = g["Grade"]
+                if "Skill" in g:
+                    print()
+                    sk = self.getSkill(g["Skill"]["Id"])
+                    grd["Subject"] += f' - {self.getSkill(g["Skill"]["Id"])}'
+                    
+                librusdb.addGrade(grd)                
                 msgCenter.sendEmail(librusdb.printGrade(g["Id"]))
