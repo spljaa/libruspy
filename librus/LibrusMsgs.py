@@ -73,4 +73,5 @@ class LibrusMsgs:
     def printGrade(self, grdid):
         msg = self.cur.execute("select subject, date, grade from grades where id = ?", (grdid,)).fetchone()
         return["""\
-{}""".format(" "), "NewGrade", " ".join([msg[2], msg[0], "({})".format(msg[1])])]
+{}""".format(msg[2] if len(msg[2])>2 else ""), "NewGrade",
+    " ".join([msg[2] if len(msg[2])<3 else "", msg[0], "({})".format(msg[1])])]

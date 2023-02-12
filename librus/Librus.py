@@ -136,24 +136,38 @@ class Librus:
     def checkNewGrades(self, librusdb, msgCenter):
         grades = self.callAPI("Grades")["Grades"]
         dgrades = self.callAPI("DescriptiveGrades")["Grades"]
+        tgrades = self.callAPI("/DescriptiveGrades/Text")["Grades"]
         indb = librusdb.getGradeIds()
-        for g in grades + dgrades:
+        for g in grades + dgrades + tgrades:
             if str(g["Id"]) in indb:
                 print(f"{g['Id']} w bazie")
             else:
                 print(f"{g['Id']} pobierane")
                 grd = {}
                 grd["Id"] = g["Id"]
-                grd["Date"] = g["Date"]
-                grd["Subject"] = self.subjects[g["Subject"]["Id"]]
+                if "date" in g:
+                    grd["Date"] = g["Date"]
+                else:
+                    if "PublishDate" in g:
+                        grd["Date"] = g["PublishDate"][:10]
+                if "Subject" in g:
+                    grd["Subject"] = self.subjects[g["Subject"]["Id"]]
+                if "Name" in g:
+                    grd["Subject"] = g["Name"]
                 if "RealGradeValue" in g:
                     grd["Grade"] = g["RealGradeValue"]
                 else:
                     grd["Grade"] = g["Grade"]
+                if grd["Grade"] is None:
+                    grd["Grade"] = ""
                 if "Skill" in g:
                     print()
                     sk = self.getSkill(g["Skill"]["Id"])
                     grd["Subject"] += f' - {self.getSkill(g["Skill"]["Id"])}'.replace('\n',"")
-                    
+                if "SubjectCompetence" in g:
+                    cid = g["SubjectCompetence"]["Id"]
+                    cname = self.callAPI(f"/DescriptiveGrades/SubjectCompetences/{cid}")["SubjectCompetence"]["Name"]
+                    grd["Subject"] += f' - {cname}'.replace('\n',"")
+                
                 librusdb.addGrade(grd)                
                 msgCenter.sendEmail(librusdb.printGrade(g["Id"]))
