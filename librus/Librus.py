@@ -150,6 +150,8 @@ class Librus:
                 else:
                     if "PublishDate" in g:
                         grd["Date"] = g["PublishDate"][:10]
+                    else:
+                        grd["Date"] = ""
                 if "Subject" in g:
                     grd["Subject"] = self.subjects[g["Subject"]["Id"]]
                 if "Name" in g:
