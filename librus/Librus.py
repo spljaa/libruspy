@@ -19,6 +19,7 @@ class Librus:
     teachers = {}
     classrooms = {}
     skills = {}
+    atypes = {}
 
     def __init__(self, user, pw):
         self.username = user
@@ -70,6 +71,12 @@ class Librus:
             r = self.callAPI(f"DescriptiveGrades/Skills/{sid}")
             self.skills[sid] = r["Skill"]["Name"]
         return self.skills[sid]
+
+    def setATypes(self):
+        t = self.callAPI("Attendances/Types")
+        for it in t["Types"]:
+            self.atypes[it["Id"]] = it["Name"]
+
 
     def getClassroom(self, cid):
         if cid not in self.classrooms:
